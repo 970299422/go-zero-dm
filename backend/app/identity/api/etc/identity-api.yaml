@@ -1,0 +1,11 @@
+Name: identity-api
+Host: 0.0.0.0
+Port: 8888
+
+# 数据库配置
+DataSource: "identity.db"
+
+# JWT Auth Configuration
+JwtAuth:
+  AccessSecret: "uKq9785j8X9d8s7s6f5g4h3j2k1l" 
+  AccessExpire: 86400

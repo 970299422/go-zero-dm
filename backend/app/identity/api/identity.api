@@ -1,0 +1,28 @@
+syntax = "v1"
+
+info (
+	title:   "用户认证服务"
+	desc:    "负责用户登录与注册"
+	author:  "go-zero-learning"
+	email:   "support@go-zero.com"
+	version: "v1"
+)
+
+type (
+	// 定义登录请求结构体 (Request Body)
+	LoginReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	// 定义登录响应结构体 (Response Body)
+	LoginResp {
+		AccessToken  string `json:"accessToken"`
+		AccessExpire int64  `json:"accessExpire"`
+	}
+)
+
+service identity-api {
+	@handler Login // 声明一个 Handler，goctl 会生成 LoginHandler
+	post /api/user/login (LoginReq) returns (LoginResp)
+}
+

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # MySQL 8.0 容器
+  mysql:
+    image: mysql:8.0
+    container_name: go-zero-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: go_zero_learning
+      MYSQL_Js: Asia/Shanghai
+    ports:
+      - "33069:3306" # 将容器 3306 映射到宿主机 33069，避免端口冲突
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis 容器 (后续 Phase 4/5 会用到)
+  redis:
+    image: redis:7.0-alpine
+    container_name: go-zero-redis
+    restart: always
+    ports:
+      - "63799:6379"
+    command: redis-server --requirepass 123456

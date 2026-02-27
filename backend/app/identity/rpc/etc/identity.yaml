@@ -1,0 +1,11 @@
+Name: identity.rpc
+ListenOn: 0.0.0.0:8080
+
+# 数据库配置
+DataSource: "identity.db"
+
+# Etcd 服务发现 (后面微服务通信会用，暂时先留空或者删掉也可以，这里保留占位)
+# Etcd:
+#   Hosts:
+#   - 127.0.0.1:2379
+#   Key: identity.rpc

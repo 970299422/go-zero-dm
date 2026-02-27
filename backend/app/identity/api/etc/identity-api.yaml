@@ -9,3 +9,9 @@ DataSource: "identity.db"
 JwtAuth:
   AccessSecret: "uKq9785j8X9d8s7s6f5g4h3j2k1l" 
   AccessExpire: 86400
+
+# RPC 客户端配置 (直连模式，不走 Etcd)
+IdentityRpc:
+  Endpoints:
+    - 127.0.0.1:8080
+  NonBlock: true

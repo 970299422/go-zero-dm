@@ -5,15 +5,18 @@ package svc
 
 import (
 	"go-zero-learning/backend/app/identity/api/internal/config"
-	"go-zero-learning/backend/app/identity/api/internal/model"
+	"go-zero-learning/backend/app/identity/rpc/identity"
+	"go-zero-learning/backend/common/model"
 
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
+	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 )
 
 type ServiceContext struct {
-	Config config.Config
-	DB     *gorm.DB // 全局数据库连接对象
+	Config      config.Config
+	DB          *gorm.DB          // 全局数据库连接对象
+	IdentityRpc identity.Identity // RPC 客户端实例
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -31,7 +34,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	return &ServiceContext{
-		Config: c,
-		DB:     db,
+		Config:      c,
+		DB:          db,
+		IdentityRpc: identity.NewIdentity(zrpc.MustNewClient(c.IdentityRpc)), // 初始化 RPC 客户端
 	}
 }

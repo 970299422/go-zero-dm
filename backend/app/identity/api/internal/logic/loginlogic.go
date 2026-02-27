@@ -11,6 +11,9 @@ import (
 	"go-zero-learning/backend/app/identity/api/internal/svc"
 	"go-zero-learning/backend/app/identity/api/internal/types"
 	"go-zero-learning/backend/common/jwtx"
+	"go-zero-learning/backend/common/model"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,23 +33,30 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
-	// todo: add your logic here and delete this line
-	// 1. 模拟数据库查询 (Hardcode)
-	// TS 类比: if (req.username !== 'admin' || req.password !== '123456') ...
-	if req.Username != "admin" || req.Password != "123456" {
-		return nil, errors.New("invalid username or password")
+	// 1. 根据用户名查询用户
+	var user model.User
+	// GORM: Where条件查询，First取第一条
+	result := l.svcCtx.DB.Where("username = ?", req.Username).First(&user)
+	if result.Error != nil {
+		return nil, errors.New("用户不存在或登录失败")
 	}
 
-	// 2. 定义过期时间 (1小时)
+	// 2. 校验密码 (Hash对比)
+	// CompareHashAndPassword(数据库里的Hash值, 用户输入的明文密码)
+	// 如果不匹配，会返回 error
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		return nil, errors.New("用户名或密码错误")
+	}
+
+	// 3. 密码正确，生成 JWT Token
 	now := time.Now().Unix()
-	accessExpire := l.svcCtx.Config.JwtAuth.AccessExpire // 1小时
-	secretKey := l.svcCtx.Config.JwtAuth.AccessSecret    // // 这里硬编码了密钥！这是一个坏味道(Bad Smell)
+	accessExpire := l.svcCtx.Config.JwtAuth.AccessExpire //这是有效期时长(秒)
+	secretKey := l.svcCtx.Config.JwtAuth.AccessSecret
 
-	// 3. 生成 Token
-	// payload: { "userId": 1 }
-
+	// Payload: 放入最重要的 userId，以便后续接口知道是谁在操作
 	payload := map[string]interface{}{
-		"userId": 1,
+		"userId": user.ID,
 	}
 
 	token, err := jwtx.GetToken(secretKey, now, accessExpire, payload)
@@ -54,9 +64,8 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 		return nil, err
 	}
 
-	// 4. 返回响应
 	return &types.LoginResp{
 		AccessToken:  token,
-		AccessExpire: now + accessExpire,
+		AccessExpire: now + accessExpire, // 返回绝对时间戳
 	}, nil
 }

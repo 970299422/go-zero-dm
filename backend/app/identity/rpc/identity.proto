@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+// 1. 定义包名 (相当于 Go 的 package)
+package identity;
+
+// 2. 指定 Go 语言生成路径 (go_package = "路径;包名")
+// - "./pb": 生成的文件放在当前目录下的 pb 文件夹里
+// - "identity": 生成的 Go 包名叫 identity
+option go_package = "./pb";
+
+// 3. 定义请求和响应的数据结构 (Message)
+// 类似于 struct 或 TS 的 interface
+
+// 根据 ID 获取用户信息
+message GetUserReq {
+  int64 id = 1; // 1 不是值，是字段的唯一编号(Tag)，一旦定好就不能改！
+}
+
+message GetUserResp {
+  int64 id = 1;
+  string username = 2;
+}
+
+// 4. 定义服务 (Service)
+service Identity {
+  // 定义一个 RPC 方法：传入 GetUserReq，返回 GetUserResp
+  rpc GetUser(GetUserReq) returns(GetUserResp);
+}

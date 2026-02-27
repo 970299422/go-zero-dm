@@ -19,10 +19,41 @@ type (
 		AccessToken  string `json:"accessToken"`
 		AccessExpire int64  `json:"accessExpire"`
 	}
+	// 新增：注册请求
+	RegisterReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	// 新增：注册响应 (注册成功直接登录)
+	RegisterResp {
+		AccessToken  string `json:"accessToken"`
+		AccessExpire int64  `json:"accessExpire"`
+	}
+	// 新增：用户信息响应 (Request Body 是空的，故不需要定义)
+	UserInfoResp {
+		Id       int64  `json:"id"`
+		Username string `json:"username"`
+	}
 )
 
+// 无需认证的接口 (Login, Register)
 service identity-api {
 	@handler Login // 声明一个 Handler，goctl 会生成 LoginHandler
 	post /api/user/login (LoginReq) returns (LoginResp)
+
+	// 新增：注册接口
+	@handler Register
+	post /api/user/register (RegisterReq) returns (RegisterResp)
+}
+
+// ==== 这里是新的部分 ====
+// 需要 JWT 鉴权的接口
+// jwt: JwtAuth -> 对应配置文件的 JwtAuth 字段
+@server (
+	jwt: JwtAuth
+)
+service identity-api {
+	@handler UserInfo
+	get /api/user/userinfo returns (UserInfoResp)
 }
 

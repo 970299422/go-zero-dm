@@ -64,6 +64,11 @@ service.interceptors.response.use(
   (response: AxiosResponse<ResponseData>) => {
     const res = response.data
 
+    // 兼容 go-zero 这类直接返回业务对象的接口（无 code/data/message 包装）
+    if (res && typeof res === 'object' && !('code' in res)) {
+      return { data: res } as any
+    }
+
     // 后端统一响应格式：code: 0 表示成功，非 0 表示失败
     if (res.code !== 0) {
       // 检查是否需要跳过错误处理

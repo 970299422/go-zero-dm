@@ -14,12 +14,15 @@ import (
 )
 
 type (
-	GetUserReq  = pb.GetUserReq
-	GetUserResp = pb.GetUserResp
-
-	Identity interface {
+	GetUserReq     = pb.GetUserReq
+	GetUserResp    = pb.GetUserResp
+	CreateUserReq  = pb.CreateUserReq
+	CreateUserResp = pb.CreateUserResp
+	Identity       interface {
 		// 定义一个 RPC 方法：传入 GetUserReq，返回 GetUserResp
 		GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserResp, error)
+		// 创建用户（注册）: API 层会调用此 RPC 将注册请求下发到 RPC 服务
+		CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
 	}
 
 	defaultIdentity struct {
@@ -37,4 +40,10 @@ func NewIdentity(cli zrpc.Client) Identity {
 func (m *defaultIdentity) GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserResp, error) {
 	client := pb.NewIdentityClient(m.cli.Conn())
 	return client.GetUser(ctx, in, opts...)
+}
+
+// 创建用户（注册）: API 层会调用此 RPC 将注册请求下发到 RPC 服务
+func (m *defaultIdentity) CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error) {
+	client := pb.NewIdentityClient(m.cli.Conn())
+	return client.CreateUser(ctx, in, opts...)
 }

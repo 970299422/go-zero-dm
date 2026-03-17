@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"go-zero-learning/backend/app/identity/rpc/internal/svc"
-	pb "go-zero-learning/backend/app/identity/rpc/pb"
+	"go-zero-learning/backend/app/identity/rpc/pb"
 	"go-zero-learning/backend/common/model"
 
 	"github.com/zeromicro/go-zero/core/logx"

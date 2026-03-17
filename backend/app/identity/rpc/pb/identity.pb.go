@@ -26,7 +26,7 @@ const (
 // 根据 ID 获取用户信息
 type GetUserReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 1 不是值，是字段的唯一编号(Tag)，一旦定好就不能改！
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -120,6 +120,111 @@ func (x *GetUserResp) GetUsername() string {
 	return ""
 }
 
+// 创建用户（注册）
+type CreateUserReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserReq) Reset() {
+	*x = CreateUserReq{}
+	mi := &file_identity_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserReq) ProtoMessage() {}
+
+func (x *CreateUserReq) ProtoReflect() protoreflect.Message {
+	mi := &file_identity_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserReq.ProtoReflect.Descriptor instead.
+func (*CreateUserReq) Descriptor() ([]byte, []int) {
+	return file_identity_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateUserReq) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateUserReq) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type CreateUserResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserResp) Reset() {
+	*x = CreateUserResp{}
+	mi := &file_identity_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserResp) ProtoMessage() {}
+
+func (x *CreateUserResp) ProtoReflect() protoreflect.Message {
+	mi := &file_identity_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserResp.ProtoReflect.Descriptor instead.
+func (*CreateUserResp) Descriptor() ([]byte, []int) {
+	return file_identity_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateUserResp) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CreateUserResp) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
 var File_identity_proto protoreflect.FileDescriptor
 
 const file_identity_proto_rawDesc = "" +
@@ -130,9 +235,17 @@ const file_identity_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"9\n" +
 	"\vGetUserResp\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername2B\n" +
+	"\busername\x18\x02 \x01(\tR\busername\"G\n" +
+	"\rCreateUserReq\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"<\n" +
+	"\x0eCreateUserResp\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername2\x83\x01\n" +
 	"\bIdentity\x126\n" +
-	"\aGetUser\x12\x14.identity.GetUserReq\x1a\x15.identity.GetUserRespB\x06Z\x04./pbb\x06proto3"
+	"\aGetUser\x12\x14.identity.GetUserReq\x1a\x15.identity.GetUserResp\x12?\n" +
+	"\n" +
+	"CreateUser\x12\x17.identity.CreateUserReq\x1a\x18.identity.CreateUserRespB1Z/go-zero-learning/backend/app/identity/rpc/pb;pbb\x06proto3"
 
 var (
 	file_identity_proto_rawDescOnce sync.Once
@@ -146,16 +259,20 @@ func file_identity_proto_rawDescGZIP() []byte {
 	return file_identity_proto_rawDescData
 }
 
-var file_identity_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_identity_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_identity_proto_goTypes = []any{
-	(*GetUserReq)(nil),  // 0: identity.GetUserReq
-	(*GetUserResp)(nil), // 1: identity.GetUserResp
+	(*GetUserReq)(nil),     // 0: identity.GetUserReq
+	(*GetUserResp)(nil),    // 1: identity.GetUserResp
+	(*CreateUserReq)(nil),  // 2: identity.CreateUserReq
+	(*CreateUserResp)(nil), // 3: identity.CreateUserResp
 }
 var file_identity_proto_depIdxs = []int32{
 	0, // 0: identity.Identity.GetUser:input_type -> identity.GetUserReq
-	1, // 1: identity.Identity.GetUser:output_type -> identity.GetUserResp
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	2, // 1: identity.Identity.CreateUser:input_type -> identity.CreateUserReq
+	1, // 2: identity.Identity.GetUser:output_type -> identity.GetUserResp
+	3, // 3: identity.Identity.CreateUser:output_type -> identity.CreateUserResp
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -172,7 +289,7 @@ func file_identity_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_identity_proto_rawDesc), len(file_identity_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

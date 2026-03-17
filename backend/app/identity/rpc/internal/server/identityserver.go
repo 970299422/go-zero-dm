@@ -28,3 +28,8 @@ func (s *IdentityServer) GetUser(ctx context.Context, in *pb.GetUserReq) (*pb.Ge
 	l := logic.NewGetUserLogic(ctx, s.svcCtx)
 	return l.GetUser(in)
 }
+
+func (s *IdentityServer) CreateUser(ctx context.Context, in *pb.CreateUserReq) (*pb.CreateUserResp, error) {
+	l := logic.NewCreateUserLogic(ctx, s.svcCtx)
+	return l.CreateUser(in)
+}

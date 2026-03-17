@@ -11,7 +11,12 @@ import (
 type Config struct {
 	rest.RestConf
 	DataSource string // 新增
-	JwtAuth    struct {
+	Redis      struct {
+		Addr     string
+		Password string
+		DB       int
+	}
+	JwtAuth struct {
 		AccessSecret string
 		AccessExpire int64
 	}

@@ -21,17 +21,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Identity_GetUser_FullMethodName = "/identity.Identity/GetUser"
+	Identity_GetUser_FullMethodName    = "/identity.Identity/GetUser"
+	Identity_CreateUser_FullMethodName = "/identity.Identity/CreateUser"
 )
 
 // IdentityClient is the client API for Identity service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// 4. 定义服务 (Service)
 type IdentityClient interface {
-	// 定义一个 RPC 方法：传入 GetUserReq，返回 GetUserResp
 	GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserResp, error)
+	CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
 }
 
 type identityClient struct {
@@ -52,14 +51,22 @@ func (c *identityClient) GetUser(ctx context.Context, in *GetUserReq, opts ...gr
 	return out, nil
 }
 
+func (c *identityClient) CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUserResp)
+	err := c.cc.Invoke(ctx, Identity_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IdentityServer is the server API for Identity service.
 // All implementations must embed UnimplementedIdentityServer
 // for forward compatibility.
-//
-// 4. 定义服务 (Service)
 type IdentityServer interface {
-	// 定义一个 RPC 方法：传入 GetUserReq，返回 GetUserResp
 	GetUser(context.Context, *GetUserReq) (*GetUserResp, error)
+	CreateUser(context.Context, *CreateUserReq) (*CreateUserResp, error)
 	mustEmbedUnimplementedIdentityServer()
 }
 
@@ -72,6 +79,9 @@ type UnimplementedIdentityServer struct{}
 
 func (UnimplementedIdentityServer) GetUser(context.Context, *GetUserReq) (*GetUserResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedIdentityServer) CreateUser(context.Context, *CreateUserReq) (*CreateUserResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
 }
 func (UnimplementedIdentityServer) mustEmbedUnimplementedIdentityServer() {}
 func (UnimplementedIdentityServer) testEmbeddedByValue()                  {}
@@ -112,6 +122,24 @@ func _Identity_GetUser_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Identity_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Identity_CreateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityServer).CreateUser(ctx, req.(*CreateUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Identity_ServiceDesc is the grpc.ServiceDesc for Identity service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +150,10 @@ var Identity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUser",
 			Handler:    _Identity_GetUser_Handler,
+		},
+		{
+			MethodName: "CreateUser",
+			Handler:    _Identity_CreateUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

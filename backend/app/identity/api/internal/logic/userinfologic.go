@@ -7,6 +7,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"time"
 
 	"go-zero-learning/backend/app/identity/api/internal/svc"
 	"go-zero-learning/backend/app/identity/api/internal/types"
@@ -58,6 +60,18 @@ func (l *UserInfoLogic) UserInfo() (resp *types.UserInfoResp, err error) {
 	}
 
 	// 3. 调用 RPC 服务获取用户信息 (不再直接查数据库)
+	cacheKey := fmt.Sprintf("user:info:%d", userId)
+	cacheCtx, cancel := context.WithTimeout(l.ctx, 100*time.Millisecond)
+	if cached, cacheErr := l.svcCtx.Redis.Get(cacheCtx, cacheKey).Result(); cacheErr == nil {
+		var cachedResp types.UserInfoResp
+		if err := json.Unmarshal([]byte(cached), &cachedResp); err == nil {
+			cancel()
+			return &cachedResp, nil
+		}
+	}
+	cancel()
+
+	// 3. 缓存未命中时调用 RPC 服务获取用户信息
 	// 引入 pb 包: "go-zero-learning/backend/app/identity/rpc/pb"
 	// 注意：这里把 l.ctx 传给了 RPC，这样如果 API 超时，RPC 也会自动取消
 	rpcResp, err := l.svcCtx.IdentityRpc.GetUser(l.ctx, &identity.GetUserReq{
@@ -67,9 +81,17 @@ func (l *UserInfoLogic) UserInfo() (resp *types.UserInfoResp, err error) {
 		return nil, errors.New("获取用户信息失败: " + err.Error())
 	}
 
-	// 4. 返回给前端
-	return &types.UserInfoResp{
+	// 4. 回填缓存并返回
+	resp = &types.UserInfoResp{
 		Id:       rpcResp.Id,
 		Username: rpcResp.Username,
-	}, nil
+	}
+
+	if b, err := json.Marshal(resp); err == nil {
+		setCtx, setCancel := context.WithTimeout(l.ctx, 100*time.Millisecond)
+		_ = l.svcCtx.Redis.Set(setCtx, cacheKey, string(b), 10*time.Minute).Err()
+		setCancel()
+	}
+
+	return resp, nil
 }

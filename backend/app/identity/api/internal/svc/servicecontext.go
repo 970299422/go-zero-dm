@@ -4,11 +4,14 @@
 package svc
 
 import (
+	"time"
+
 	"go-zero-learning/backend/app/identity/api/internal/config"
 	"go-zero-learning/backend/app/identity/rpc/identity"
 	"go-zero-learning/backend/common/model"
 
 	"github.com/glebarez/sqlite"
+	"github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 )
@@ -17,6 +20,7 @@ type ServiceContext struct {
 	Config      config.Config
 	DB          *gorm.DB          // 全局数据库连接对象
 	IdentityRpc identity.Identity // RPC 客户端实例
+	Redis       *redis.Client
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -37,5 +41,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config:      c,
 		DB:          db,
 		IdentityRpc: identity.NewIdentity(zrpc.MustNewClient(c.IdentityRpc)), // 初始化 RPC 客户端
+		Redis: redis.NewClient(&redis.Options{
+			Addr:         c.Redis.Addr,
+			Password:     c.Redis.Password,
+			DB:           c.Redis.DB,
+			DialTimeout:  100 * time.Millisecond,
+			ReadTimeout:  100 * time.Millisecond,
+			WriteTimeout: 100 * time.Millisecond,
+			MaxRetries:   0,
+		}),
 	}
 }

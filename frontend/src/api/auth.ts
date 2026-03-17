@@ -9,8 +9,8 @@ export interface LoginRequest {
 
 // 登录响应数据
 export interface LoginResponse {
-  token: string
-  user_info: UserInfo
+  accessToken: string
+  accessExpire: number
 }
 
 // 用户信息（对接后端接口）
@@ -27,7 +27,7 @@ export interface UserInfo {
  */
 export function login(data: LoginRequest): Promise<ResponseData<LoginResponse>> {
   return request({
-    url: '/api/users/login',
+    url: '/api/user/login',
     method: 'post',
     data
   })
@@ -40,11 +40,10 @@ export function login(data: LoginRequest): Promise<ResponseData<LoginResponse>> 
  */
 export function register(data: {
   username: string
-  email: string
   password: string
 }): Promise<ResponseData<LoginResponse>> {
   return request({
-    url: '/api/users',
+    url: '/api/user/register',
     method: 'post',
     data
   })
@@ -56,7 +55,7 @@ export function register(data: {
  */
 export function getUserInfo(): Promise<ResponseData<UserInfo>> {
   return request({
-    url: '/api/users/me',
+    url: '/api/user/userinfo',
     method: 'get'
   })
 }

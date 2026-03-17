@@ -9,6 +9,7 @@ import (
 
 	"go-zero-learning/backend/app/identity/api/internal/config"
 	"go-zero-learning/backend/app/identity/api/internal/handler"
+	"go-zero-learning/backend/app/identity/api/internal/middleware"
 	"go-zero-learning/backend/app/identity/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -25,6 +26,9 @@ func main() {
 
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
+
+	// 注册全局轻量 Token 提取中间件（不会替代 go-zero 的鉴权）
+	server.Use(middleware.JWTMiddleware(c.JwtAuth.AccessSecret))
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

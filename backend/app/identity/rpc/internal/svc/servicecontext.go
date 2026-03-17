@@ -3,7 +3,8 @@ package svc
 import (
 	"go-zero-learning/backend/app/identity/rpc/internal/config"
 	// 这里为了简化，我们直接引用 API 层的 model
-	// "go-zero-learning/backend/common/model"
+	"go-zero-learning/backend/common/model"
+
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
@@ -18,6 +19,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	db, err := gorm.Open(sqlite.Open(c.DataSource), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
+	}
+
+	// 自动建表 (Auto Migrate)
+	// 每次启动服务时，GORM 会检查表结构变化并自动同步
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		panic("failed to migrate database: " + err.Error())
 	}
 
 	return &ServiceContext{

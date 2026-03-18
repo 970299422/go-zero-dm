@@ -1,0 +1,31 @@
+syntax = "v1"
+
+info (
+	title:   "demo"
+	desc:    "demo api"
+	author:  "codex"
+	version: "v1"
+)
+
+type (
+	ItemResp {
+		id        int64
+		name      string
+		updatedAt string
+	}
+	UpdateItemReq {
+		name string
+	}
+)
+
+@server (
+	prefix: /demo
+)
+service demo-api {
+	@handler GetItem
+	get /item/:id returns (ItemResp)
+
+	@handler UpdateItem
+	put /item/:id (UpdateItemReq) returns (ItemResp)
+}
+

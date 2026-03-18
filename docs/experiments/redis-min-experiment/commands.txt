@@ -1,0 +1,17 @@
+docker run --name redis-min-exp -p 6379:6379 -d redis:7
+docker exec -it redis-min-exp redis-cli SET user:info:1 "hello"
+docker exec -it redis-min-exp redis-cli GET user:info:1
+docker exec -it redis-min-exp redis-cli EXPIRE user:info:1 5
+docker exec -it redis-min-exp redis-cli TTL user:info:1
+Start-Sleep -Seconds 6
+
+docker exec -it redis-min-exp redis-cli GET user:info:1
+
+Actual execution (no -it):
+docker exec redis-min-exp redis-cli SET user:info:1 "hello"
+docker exec redis-min-exp redis-cli GET user:info:1
+docker exec redis-min-exp redis-cli EXPIRE user:info:1 5
+docker exec redis-min-exp redis-cli TTL user:info:1
+Start-Sleep -Seconds 6
+docker exec redis-min-exp redis-cli GET user:info:1
+

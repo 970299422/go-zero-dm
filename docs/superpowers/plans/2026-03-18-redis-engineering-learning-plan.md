@@ -298,11 +298,15 @@ type RedisCache struct {
 }
 
 func NewRedisCache(addr, password string, db int, timeoutMs int) *RedisCache {
+    timeout := time.Duration(timeoutMs) * time.Millisecond
     rdb := redis.NewClient(&redis.Options{
         Addr: addr,
         Password: password,
         DB: db,
         MaxRetries: 0,
+        DialTimeout: timeout,
+        ReadTimeout: timeout,
+        WriteTimeout: timeout,
     })
     return &RedisCache{client: rdb, timeout: time.Duration(timeoutMs) * time.Millisecond}
 }

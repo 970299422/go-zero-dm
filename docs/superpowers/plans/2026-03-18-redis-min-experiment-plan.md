@@ -1,146 +1,146 @@
-﻿# Redis Minimal Experiment Implementation Plan
+﻿# Redis 最小实验实现计划
 
-> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **面向自动化执行的代理：** 必须使用 superpowers:subagent-driven-development（如可用）或 superpowers:executing-plans 来执行本计划。步骤使用 `- [ ]` 复选框语法跟踪。
 
-**Goal:** Run a disposable Redis experiment in a temporary directory using Docker and redis-cli to observe SET/GET/TTL/expiration and produce a one-sentence takeaway.
+**目标：** 在临时目录中用 Docker + redis-cli 完成一次可随时删除的 Redis 实验，观察 SET/GET/TTL/过期，并产出一句话总结。
 
-**Architecture:** A single Docker Redis container exposes localhost:6379. We interact via redis-cli in the same shell. No application integration; only command-level verification.
+**架构：** 单个 Redis 容器对外暴露 localhost:6379，通过 `docker exec` 运行 redis-cli。无应用接入，仅做命令级验证。
 
-**Tech Stack:** Docker, redis-cli (from container), PowerShell
-
----
-
-## File/Artifact Map
-- Create: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md` (notes + takeaway)
-- Create: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt` (exact commands run, for replay)
+**技术栈：** Docker、redis-cli（容器内）、PowerShell
 
 ---
 
-### Task 1: Prepare Temporary Workspace
+## 文件/产物清单
+- 新建：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`（观察记录 + 总结）
+- 新建：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`（可复用命令清单）
 
-**Files:**
-- Create: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`
-- Create: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`
+---
 
-- [ ] **Step 1: Create the temp directory**
+### 任务 1：准备临时工作区
 
-Run: `New-Item -ItemType Directory -Force -Path $env:TEMP\redis-min-experiment`
-Expected: Directory exists at `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment`
+**文件：**
+- 新建：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`
+- 新建：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`
 
-- [ ] **Step 2: Seed notes files**
+- [ ] **步骤 1：创建临时目录**
 
-Run:
+运行：`New-Item -ItemType Directory -Force -Path $env:TEMP\redis-min-experiment`
+预期：目录存在 `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment`
+
+- [ ] **步骤 2：初始化记录文件**
+
+运行：
 ```powershell
-$readme = "# Redis Minimal Experiment`n`n## Observations`n- `n`n## One-sentence takeaway`n- `n"
+$readme = "# Redis 最小实验`n`n## 观察记录`n- `n`n## 一句话总结`n- `n"
 Set-Content -Path $env:TEMP\redis-min-experiment\README.md -Value $readme -Encoding UTF8
 Set-Content -Path $env:TEMP\redis-min-experiment\commands.txt -Value "" -Encoding UTF8
 ```
-Expected: `README.md` and `commands.txt` exist with the stub content.
+预期：`README.md` 与 `commands.txt` 已生成且包含模板内容。
 
 ---
 
-### Task 2: Start Redis (Docker)
+### 任务 2：启动 Redis（Docker）
 
-**Files:**
-- Modify: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`
+**文件：**
+- 修改：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`
 
-- [ ] **Step 1: Start Redis container**
+- [ ] **步骤 1：启动 Redis 容器**
 
-Run:
+运行：
 ```powershell
 docker run --name redis-min-exp -p 6379:6379 -d redis:7
 ```
-Expected: Container id printed. `docker ps` shows `redis-min-exp` running.
+预期：打印容器 ID；`docker ps` 显示 `redis-min-exp` 运行中。
 
-- [ ] **Step 2: Record the command**
+- [ ] **步骤 2：记录命令**
 
-Append to `commands.txt`:
+追加到 `commands.txt`：
 ```text
 docker run --name redis-min-exp -p 6379:6379 -d redis:7
 ```
 
 ---
 
-### Task 3: Minimal Redis Interaction (SET/GET/TTL/Expire)
+### 任务 3：最小 Redis 交互（SET/GET/TTL/过期）
 
-**Files:**
-- Modify: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`
-- Modify: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`
+**文件：**
+- 修改：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\commands.txt`
+- 修改：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`
 
-- [ ] **Step 1: SET a key**
+- [ ] **步骤 1：SET 一个 key**
 
-Run:
+运行：
 ```powershell
 docker exec -it redis-min-exp redis-cli SET user:info:1 "hello"
 ```
-Expected: `OK`
+预期：`OK`
 
-- [ ] **Step 2: GET the key**
+- [ ] **步骤 2：GET 读取**
 
-Run:
+运行：
 ```powershell
 docker exec -it redis-min-exp redis-cli GET user:info:1
 ```
-Expected: `"hello"`
+预期：`"hello"`
 
-- [ ] **Step 3: Set TTL**
+- [ ] **步骤 3：设置 TTL**
 
-Run:
+运行：
 ```powershell
 docker exec -it redis-min-exp redis-cli EXPIRE user:info:1 5
 ```
-Expected: `(integer) 1`
+预期：`(integer) 1`
 
-- [ ] **Step 4: Observe TTL**
+- [ ] **步骤 4：观察 TTL 递减**
 
-Run:
+运行：
 ```powershell
 docker exec -it redis-min-exp redis-cli TTL user:info:1
 ```
-Expected: A small integer (e.g., 4, 3, 2...) that decreases on repeat.
+预期：出现一个小整数（如 4、3、2…），重复执行会递减。
 
-- [ ] **Step 5: Confirm expiration miss**
+- [ ] **步骤 5：验证过期 miss**
 
-Run:
+运行：
 ```powershell
 Start-Sleep -Seconds 6
 
 docker exec -it redis-min-exp redis-cli GET user:info:1
 ```
-Expected: `(nil)`
+预期：`(nil)`
 
-- [ ] **Step 6: Record commands and observations**
+- [ ] **步骤 6：记录命令与现象**
 
-Append the five redis-cli commands into `commands.txt` and summarize the TTL behavior in `README.md` under Observations.
+把上面的 redis-cli 命令追加到 `commands.txt`，并在 `README.md` 的“观察记录”里写下 TTL 递减与过期行为。
 
 ---
 
-### Task 4: Cleanup
+### 任务 4：清理
 
-**Files:**
-- Modify: `C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`
+**文件：**
+- 修改：`C:\Users\Dongm\AppData\Local\Temp\redis-min-experiment\README.md`
 
-- [ ] **Step 1: Stop and remove container**
+- [ ] **步骤 1：停止并删除容器**
 
-Run:
+运行：
 ```powershell
 docker stop redis-min-exp
 
 docker rm redis-min-exp
 ```
-Expected: Container removed; `docker ps -a` no longer lists it.
+预期：容器被删除；`docker ps -a` 不再出现。
 
-- [ ] **Step 2: Write one-sentence takeaway**
+- [ ] **步骤 2：写一句话总结**
 
-Add one concise sentence to `README.md`, for example:
-"Cache-Aside = read cache first, miss goes to DB, then write cache with TTL so future reads are fast but never block the main flow when cache fails."
+在 `README.md` 里写一句总结，例如：
+“Cache-Aside = 先读缓存，未命中再查源数据并写回，同时设置 TTL，保证缓存失效时主链路不被拖垮。”
 
 ---
 
-## Verification
-- `docker ps` shows container running during Task 3.
-- `redis-cli GET` returns value before TTL expires, then `(nil)` after expiry.
-- `README.md` contains observations + a one-sentence takeaway.
+## 验证
+- Task 3 期间 `docker ps` 显示容器运行中。
+- 过期前 `GET` 有值，过期后 `GET` 为 `(nil)`。
+- `README.md` 包含观察记录 + 一句话总结。
 
-## Notes
-- If port 6379 is already in use, re-run Docker with `-p 6380:6379` and replace commands with `-p 6380:6379` and `redis-cli -p 6380` (or `docker exec` stays the same).
+## 备注
+- 若 6379 被占用，改用 `-p 6380:6379`，并同步更新相关命令。

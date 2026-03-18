@@ -1,57 +1,57 @@
-﻿# Design: Redis Minimal Experiment (Docker + redis-cli)
+﻿# 设计：Redis 最小实验（Docker + redis-cli）
 
-Date: 2026-03-18
-Owner: Dongm + Codex
-Status: Draft
+日期：2026-03-18
+负责人：Dongm + Codex
+状态：已批准
 
-## Goal
-Build a minimal, disposable Redis experiment in a temporary directory to understand:
-- Basic read/write
-- TTL and expiration
-- Cache-aside intuition from direct observation
+## 目标
+在一个可随时删除的临时目录中完成最小 Redis 实验，以理解：
+- 基本读写
+- TTL 与过期行为
+- 通过直接观察形成 Cache-Aside 直觉
 
-## Scope
-In scope:
-- Start Redis via Docker on localhost:6379
-- Use redis-cli to run a short command sequence
-- Observe TTL countdown and expired miss
-- Write one-sentence takeaway
+## 范围
+包含：
+- 使用 Docker 在本机 6379 启动 Redis
+- 用 redis-cli 跑一段最短命令链
+- 观察 TTL 倒计时与过期 miss
+- 写一句话总结
 
-Out of scope:
-- Application integration
-- Cache consistency strategies
-- Multi-key design, clustering, or persistence tuning
+不包含：
+- 应用接入
+- 缓存一致性策略
+- 多 key 设计、集群或持久化调优
 
-## Approach Options
-1. Docker + redis-cli commands (recommended)
-   - Fast feedback, minimal code
-2. Docker + minimal Go script
-   - Closer to project stack, slightly more setup
-3. Docker + minimal JS script
-   - Familiar to frontend, less aligned with Go stack
+## 方案备选
+1. Docker + redis-cli 命令（推荐）
+   - 反馈最快、最少代码
+2. Docker + 最小 Go 脚本
+   - 更贴近项目栈、略多准备
+3. Docker + 最小 JS 脚本
+   - 对前端熟悉，但与 Go 栈稍割裂
 
-Chosen: Option 1
+选择：方案 1
 
-## Experiment Flow
-1. Create a temporary working directory.
-2. Start Redis in Docker (publish 6379).
-3. Run these commands:
-   - SET a key
-   - GET the key
-   - EXPIRE the key
-   - TTL to observe remaining time
-   - Wait for expiry, GET to confirm miss
-4. Record one-sentence takeaway about cache-aside and expiration.
+## 实验流程
+1. 创建临时工作目录。
+2. 用 Docker 启动 Redis（本机 6379）。
+3. 运行以下命令链：
+   - SET 一个 key
+   - GET 读取
+   - EXPIRE 设置 TTL
+   - TTL 观察剩余时间
+   - 等待过期后 GET 验证 miss
+4. 记录一句话总结 Cache-Aside + 过期机制。
 
-## Success Criteria
-- Redis is reachable locally.
-- TTL decreases and expires as expected.
-- You can explain the flow in one sentence without referencing notes.
+## 成功标准
+- Redis 本地可达。
+- TTL 正常递减并过期。
+- 能用一句话说明流程，不看笔记也能讲清楚。
 
-## Risks / Mitigations
-- Docker not available: fall back to local Redis install or ask user to enable Docker.
-- Port 6379 in use: bind to an alternate port and update commands.
+## 风险与应对
+- Docker 不可用：改为本机安装 Redis 或先让用户启用 Docker。
+- 6379 端口被占用：改用 6380 并同步更新命令。
 
-## Deliverables
-- A single command list and the resulting observations.
-- One-sentence takeaway.
+## 交付物
+- 一份命令清单与现象记录。
+- 一句话总结。

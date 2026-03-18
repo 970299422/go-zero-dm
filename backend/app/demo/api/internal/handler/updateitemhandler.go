@@ -20,6 +20,7 @@ func UpdateItemHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
+		_ = req.Id
 		l := logic.NewUpdateItemLogic(r.Context(), svcCtx)
 		resp, err := l.UpdateItem(&req)
 		if err != nil {

@@ -27,6 +27,7 @@ func NewUpdateItemLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 }
 
 func (l *UpdateItemLogic) UpdateItem(req *types.UpdateItemReq) (resp *types.ItemResp, err error) {
+	_ = req.Id
 	// todo: add your logic here and delete this line
 
 	return

@@ -13,8 +13,12 @@ type (
 		name      string
 		updatedAt string
 	}
+	GetItemReq {
+		Id int64 `path:"id"`
+	}
 	UpdateItemReq {
-		name string
+		Id   int64  `path:"id"`
+		Name string `json:"name"`
 	}
 )
 
@@ -23,7 +27,7 @@ type (
 )
 service demo-api {
 	@handler GetItem
-	get /item/:id returns (ItemResp)
+	get /item/:id (GetItemReq) returns (ItemResp)
 
 	@handler UpdateItem
 	put /item/:id (UpdateItemReq) returns (ItemResp)

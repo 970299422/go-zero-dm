@@ -26,7 +26,8 @@ func NewGetItemLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetItemLo
 	}
 }
 
-func (l *GetItemLogic) GetItem() (resp *types.ItemResp, err error) {
+func (l *GetItemLogic) GetItem(req *types.GetItemReq) (resp *types.ItemResp, err error) {
+	_ = req.Id
 	// todo: add your logic here and delete this line
 
 	return

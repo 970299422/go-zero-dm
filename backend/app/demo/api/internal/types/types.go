@@ -3,6 +3,10 @@
 
 package types
 
+type GetItemReq struct {
+	Id int64 `path:"id"`
+}
+
 type ItemResp struct {
 	Id        int64
 	Name      string
@@ -10,5 +14,6 @@ type ItemResp struct {
 }
 
 type UpdateItemReq struct {
-	Name string
+	Id   int64  `path:"id"`
+	Name string `json:"name"`
 }

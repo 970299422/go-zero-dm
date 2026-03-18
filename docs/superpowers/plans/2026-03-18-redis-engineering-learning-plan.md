@@ -14,7 +14,7 @@
 - Create: `backend/app/demo/api/demo.api` (API DSL)
 - Create: `backend/app/demo/api/main.go` (service entry)
 - Create: `backend/app/demo/api/internal/config/config.go`
-- Create: `backend/app/demo/api/internal/config/config.yaml`
+- Create: `backend/app/demo/api/etc/demo.yaml`
 - Create: `backend/app/demo/api/internal/handler/getitemhandler.go`
 - Create: `backend/app/demo/api/internal/handler/updateitemhandler.go`
 - Create: `backend/app/demo/api/internal/logic/getitemlogic.go`
@@ -25,7 +25,7 @@
 - Create: `backend/app/demo/api/internal/cache/redis.go`
 - Create: `backend/app/demo/api/internal/cache/keys.go`
 - Create: `backend/app/demo/api/internal/seed/seed.go`
-- Create: `backend/app/demo/api/internal/httpx/response.go` (simple response helper)
+- Create: `backend/app/demo/api/internal/util/json.go` (json helper)
 - Create: `docs/experiments/redis-demo-api/README.md` (3-point summary + repro steps)
 
 ---
@@ -91,7 +91,7 @@ git commit -m "feat: scaffold demo api"
 - Create: `backend/app/demo/api/internal/seed/seed.go`
 - Modify: `backend/app/demo/api/internal/svc/servicecontext.go`
 - Modify: `backend/app/demo/api/internal/config/config.go`
-- Modify: `backend/app/demo/api/internal/config/config.yaml`
+- Modify: `backend/app/demo/api/etc/demo.yaml`
 
 - [ ] **Step 1: Add DB config**
 
@@ -105,7 +105,7 @@ type Config struct {
 }
 ```
 
-Update `config.yaml`:
+Update `demo.yaml`:
 ```yaml
 SQLite:
   Path: ./demo.db
@@ -246,7 +246,7 @@ git commit -m "feat: add sqlite store and seed"
 - Create: `backend/app/demo/api/internal/cache/keys.go`
 - Modify: `backend/app/demo/api/internal/svc/servicecontext.go`
 - Modify: `backend/app/demo/api/internal/config/config.go`
-- Modify: `backend/app/demo/api/internal/config/config.yaml`
+- Modify: `backend/app/demo/api/etc/demo.yaml`
 - Modify: `backend/app/demo/api/internal/logic/getitemlogic.go`
 
 - [ ] **Step 1: Add Redis config**
@@ -266,7 +266,7 @@ type Config struct {
 }
 ```
 
-`config.yaml`:
+`demo.yaml`:
 ```yaml
 Redis:
   Addr: 127.0.0.1:6379
@@ -297,6 +297,7 @@ func NewRedisCache(addr, password string, db int, timeoutMs int) *RedisCache {
         Addr: addr,
         Password: password,
         DB: db,
+        MaxRetries: 0,
     })
     return &RedisCache{client: rdb, timeout: time.Duration(timeoutMs) * time.Millisecond}
 }
@@ -368,11 +369,21 @@ if err != nil {
 }
 resp := types.ItemResp{Id: item.ID, Name: item.Name, UpdatedAt: item.UpdatedAt}
 // 3) set cache with TTL=60s (ignore error)
-_ = l.svcCtx.Cache.Set(l.ctx, key, mustJSON(resp), 60*time.Second)
+_ = l.svcCtx.Cache.Set(l.ctx, key, util.MustJSON(resp), 60*time.Second)
 return &resp, nil
 ```
 
-Add helper inside logic or a small util for JSON marshal.
+Add helper in `internal/util/json.go`:
+```go
+package util
+
+import "encoding/json"
+
+func MustJSON(v any) string {
+    b, _ := json.Marshal(v)
+    return string(b)
+}
+```
 
 - [ ] **Step 5: Commit**
 

@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"go-zero-learning/backend/app/demo/api/internal/svc"
+	"go-zero-learning/backend/app/demo/api/internal/store"
 	"go-zero-learning/backend/app/demo/api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -27,8 +28,18 @@ func NewUpdateItemLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 }
 
 func (l *UpdateItemLogic) UpdateItem(req *types.UpdateItemReq) (resp *types.ItemResp, err error) {
-	_ = req.Id
-	// todo: add your logic here and delete this line
+	item := store.Item{
+		ID:        req.Id,
+		Name:      req.Name,
+		UpdatedAt: "2026-03-18T00:00:00Z",
+	}
+	if err := l.svcCtx.Store.SaveItem(l.ctx, item); err != nil {
+		return nil, err
+	}
 
-	return
+	return &types.ItemResp{
+		Id:        item.ID,
+		Name:      item.Name,
+		UpdatedAt: item.UpdatedAt,
+	}, nil
 }

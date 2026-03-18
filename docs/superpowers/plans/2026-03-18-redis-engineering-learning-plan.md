@@ -119,7 +119,7 @@ package store
 
 import (
     "database/sql"
-    _ "github.com/mattn/go-sqlite3"
+    _ "modernc.org/sqlite"
     "time"
 )
 
@@ -134,7 +134,7 @@ type SQLiteStore struct {
 }
 
 func NewSQLiteStore(path string) (*SQLiteStore, error) {
-    db, err := sql.Open("sqlite3", path)
+    db, err := sql.Open("sqlite", path)
     if err != nil {
         return nil, err
     }
@@ -230,7 +230,12 @@ func NewServiceContext(c Config) *ServiceContext {
 }
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Sync deps**
+
+Run: `go mod tidy`
+Expected: sqlite/redis deps added as needed.
+
+- [ ] **Step 6: Commit**
 
 ```bash
 git add backend/app/demo/api/internal backend/app/demo/api/internal/config
@@ -444,7 +449,10 @@ Ensure cache errors never fail the request:
 Repro:
 - start redis (docker)
 - run demo api
-- curl GET/PUT as above
+- curl GET/PUT:
+  - curl http://127.0.0.1:8888/demo/item/1
+  - curl -X PUT http://127.0.0.1:8888/demo/item/1 -H "Content-Type: application/json" -d "{\"name\":\"pear\"}"
+  - curl http://127.0.0.1:8888/demo/item/1
 ```
 
 - [ ] **Step 3: Commit**

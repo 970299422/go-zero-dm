@@ -15,6 +15,9 @@ func TestNewServiceContextSeedsSQLite(t *testing.T) {
 	c.SQLite.Path = filepath.Join(t.TempDir(), "demo.db")
 
 	ctx := NewServiceContext(c)
+	defer func() {
+		_ = ctx.Close()
+	}()
 
 	first, err := ctx.Store.GetItem(context.Background(), 1)
 	if err != nil {

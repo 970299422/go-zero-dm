@@ -10,4 +10,10 @@ type Config struct {
 	SQLite struct {
 		Path string
 	}
+	Redis struct {
+		Addr      string
+		Password  string
+		DB        int
+		TimeoutMs int
+	}
 }

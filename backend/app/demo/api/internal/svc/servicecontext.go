@@ -6,15 +6,19 @@ package svc
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go-zero-learning/backend/app/demo/api/internal/config"
 	"go-zero-learning/backend/app/demo/api/internal/seed"
 	"go-zero-learning/backend/app/demo/api/internal/store"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type ServiceContext struct {
 	Config config.Config
 	Store  *store.SQLiteStore
+	Redis  *redis.Client
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -31,8 +35,29 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		panic(fmt.Sprintf("failed to seed sqlite database: %v", err))
 	}
 
+	timeout := time.Duration(c.Redis.TimeoutMs) * time.Millisecond
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:         c.Redis.Addr,
+		Password:     c.Redis.Password,
+		DB:           c.Redis.DB,
+		DialTimeout:  timeout,
+		ReadTimeout:  timeout,
+		WriteTimeout: timeout,
+		MaxRetries:   0,
+	})
+
 	return &ServiceContext{
 		Config: c,
 		Store:  sqliteStore,
+		Redis:  rdb,
 	}
+}
+
+func (s *ServiceContext) Close() error {
+	if s == nil || s.Store == nil {
+		return nil
+	}
+
+	return s.Store.Close()
 }

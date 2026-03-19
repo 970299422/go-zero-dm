@@ -5,9 +5,11 @@ package logic
 
 import (
 	"context"
+	"fmt"
+	"time"
 
-	"go-zero-learning/backend/app/demo/api/internal/svc"
 	"go-zero-learning/backend/app/demo/api/internal/store"
+	"go-zero-learning/backend/app/demo/api/internal/svc"
 	"go-zero-learning/backend/app/demo/api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -31,10 +33,15 @@ func (l *UpdateItemLogic) UpdateItem(req *types.UpdateItemReq) (resp *types.Item
 	item := store.Item{
 		ID:        req.Id,
 		Name:      req.Name,
-		UpdatedAt: "2026-03-18T00:00:00Z",
+		UpdatedAt: time.Now().UTC().Format(time.RFC3339),
 	}
 	if err := l.svcCtx.Store.SaveItem(l.ctx, item); err != nil {
 		return nil, err
+	}
+
+	key := fmt.Sprintf("demo:item:%d", req.Id)
+	if delErr := l.svcCtx.Redis.Del(l.ctx, key).Err(); delErr != nil {
+		logx.Errorf("redis del failed: %v", delErr)
 	}
 
 	return &types.ItemResp{
